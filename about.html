@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dilshan Yapa - 3D Generalist Portfolio</title>
+    
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-teal: #6ee7d5; /* Main background */
+            --box-white: #ffffff;
+            --accent-yellow: #ffcf24;
+            --accent-teal: #00c7b5;
+            --accent-pink: #ffb6c1;
+            --border-dark: #111111;
+            --ui-dark: #333333;
+        }
+
+        body {
+            background-color: var(--bg-teal);
+            font-family: 'Outfit', sans-serif;
+            color: var(--border-dark);
+            overflow-x: hidden;
+            /* Precise grid background from images */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        .font-playful {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Base Neo-brutalist / Flat Design Borders */
+        .heavy-border {
+            border: 2px solid var(--border-dark);
+        }
+        
+        .shadow-offset {
+            box-shadow: 4px 4px 0px 0px var(--border-dark);
+        }
+        
+        .shadow-offset-sm {
+            box-shadow: 2px 2px 0px 0px var(--border-dark);
+        }
+
+        /* --- THE SELECTION BOUNDING BOX COMPONENT --- */
+        .selection-box {
+            position: relative;
+            background-color: var(--box-white);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--box-white);
+            border: 1px solid var(--border-dark);
+            z-index: 10;
+        }
+        .node-tl { top: -4px; left: -4px; }
+        .node-tc { top: -4px; left: calc(50% - 4px); }
+        .node-tr { top: -4px; right: -4px; }
+        .node-ml { top: calc(50% - 4px); left: -4px; }
+        .node-mr { top: calc(50% - 4px); right: -4px; }
+        .node-bl { bottom: -4px; left: -4px; }
+        .node-bc { bottom: -4px; left: calc(50% - 4px); }
+        .node-br { bottom: -4px; right: -4px; }
+
+        /* Custom Accordion styling */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* ZigZag SVG Pattern for Titles */
+        .zigzag-underline {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 L5 0 L15 10 L20 5' stroke='%23ffb6c1' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-position: bottom;
+        }
+
+        /* --- TEXT STROKE FIX --- 
+           Replaces -webkit-text-stroke to prevent internal vector path rendering glitches */
+        .text-stroke-thin {
+            text-shadow: -0.5px -0.5px 0 var(--border-dark), 0.5px -0.5px 0 var(--border-dark), -0.5px 0.5px 0 var(--border-dark), 0.5px 0.5px 0 var(--border-dark);
+        }
+        .text-stroke-base {
+            text-shadow: -1px -1px 0 var(--border-dark), 1px -1px 0 var(--border-dark), -1px 1px 0 var(--border-dark), 1px 1px 0 var(--border-dark);
+        }
+        .text-stroke-thick {
+            text-shadow: -1.5px -1.5px 0 var(--border-dark), 1.5px -1.5px 0 var(--border-dark), -1.5px 1.5px 0 var(--border-dark), 1.5px 1.5px 0 var(--border-dark), 0 1.5px 0 var(--border-dark), 0 -1.5px 0 var(--border-dark), 1.5px 0 0 var(--border-dark), -1.5px 0 0 var(--border-dark);
+        }
+
+        /* Navigation Bar Styles Converted to this Theme */
+        .main-nav {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9990;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid var(--border-dark);
+            border-radius: 9999px;
+            padding: 0.5rem 1.25rem;
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 4px 4px 0px 0px var(--border-dark);
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+        
+        .nav-group.left {
+            justify-content: flex-end;
+            padding-right: 1.5rem;
+        }
+        
+        .nav-group.right {
+            justify-content: flex-start;
+            padding-left: 1.5rem;
+        }
+
+        .brand-container {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-link {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--border-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-teal);
+        }
+
+        .logo-swap {
+            color: var(--border-dark);
+            text-decoration: none;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            width: 75px; 
+            text-align: center;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .logo-swap::after {
+            content: "xolotl";
+            transition: color 0.3s ease;
+        }
+
+        .logo-swap:hover::after {
+            content: "Labs";
+            color: var(--accent-teal);
+        }
+
+        /* Social Tooltip Styles */
+        .social-icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .social-tooltip {
+            visibility: hidden;
+            background-color: var(--border-dark);
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 2px 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #333;
+            font-weight: bold;
+        }
+        .social-icon-wrapper:hover .social-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav {
+                padding: 0.5rem 0.75rem;
+                max-width: 95%;
+            }
+            .nav-group { gap: 0.75rem; }
+            .nav-group.left { padding-right: 0.75rem; }
+            .nav-group.right { padding-left: 0.75rem; }
+            .nav-link { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-24 flex flex-col items-center gap-16 px-4">
+
+    <!-- ==========================================
+         NAVIGATION BAR
+         ========================================== -->
+    <nav id="main-nav" class="main-nav">
+        <div class="nav-group left">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="portfolio.html" class="nav-link">Portfolio</a>
+        </div>
+        
+        <div class="brand-container">
+            <a href="index.html" id="target-logo" class="logo-swap"></a>
+        </div>
+        
+        <div class="nav-group right">
+            <a href="index.html#services" class="nav-link">Services</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- ==========================================
+         BLOCK 1: TITLE BANNER 
+         ========================================== -->
+    <div class="selection-box w-full max-w-3xl py-12 px-8 flex flex-col items-center justify-center text-center mt-4">
+        <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+        <div class="node node-ml"></div><div class="node node-mr"></div>
+        <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+        <h1 class="text-5xl md:text-7xl font-black leading-tight tracking-tight uppercase">
+            Dilshan <span class="zigzag-underline pb-2 inline-block">Yapa</span><br> 3D
+            Generalist <span class="text-yellow-400">✦✦</span> Gamer<br>
+            <span class="text-[var(--accent-teal)]">🌻☘️</span> Nature Lover
+        </h1>
+    </div>
+
+    <!-- ==========================================
+         BLOCK 2: EDITOR SOFTWARE WINDOW (WITH MAIN IMG)
+         ========================================== -->
+    <div class="w-full max-w-4xl heavy-border bg-[var(--ui-dark)] rounded-t-xl overflow-hidden flex flex-col shadow-xl z-20 relative">
+        <div class="w-full bg-white border-b-2 border-[var(--border-dark)] p-2 flex items-center justify-between">
+            <div class="flex gap-1.5 ml-2">
+                <div class="w-3 h-3 rounded-full bg-red-400 border border-black"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400 border border-black"></div>
+                <div class="w-3 h-3 rounded-full bg-green-400 border border-black"></div>
+            </div>
+            <div class="text-xs font-bold text-gray-700 tracking-wider uppercase">In My Element</div>
+            <div></div>
+        </div>
+
+        <div class="flex flex-row w-full h-[320px] sm:h-[420px] md:h-[500px]">
+            <div class="w-12 md:w-16 bg-[#e0e0e0] border-r-2 border-[var(--border-dark)] flex flex-col items-center py-2 gap-2">
+                <button class="p-1 hover:bg-white rounded"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM9 3v18M3 9h18"/></svg></button>
+                <button class="p-1 hover:bg-white rounded"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+                <button class="p-1 hover:bg-white rounded"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></button>
+                <button class="p-1 hover:bg-white rounded"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+                
+                <div class="mt-auto flex flex-col gap-1 mb-2">
+                    <div class="w-6 h-6 bg-black border border-white"></div>
+                    <div class="w-6 h-6 bg-white border border-black -mt-2 ml-2"></div>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-[#222] p-4 md:p-6 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #808080 25%, transparent 25%, transparent 75%, #808080 75%, #808080), repeating-linear-gradient(45deg, #808080 25%, #ffffff 25%, #ffffff 75%, #808080 75%, #808080); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+                
+                <div class="selection-box w-full max-w-lg h-full bg-white flex items-center justify-center overflow-hidden p-1 relative shadow-lg">
+                    <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                    <div class="node node-ml"></div><div class="node node-mr"></div>
+                    <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+                    
+                    <img src="aboutmemainimg.webp" alt="Dilshan Yapa 3D Generalist Main Image" class="w-full h-full object-contain md:object-cover rounded-sm" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         BLOCK 3: BROWSER WINDOW BANNER
+         ========================================== -->
+    <div id="services" class="w-full max-w-3xl flex flex-col heavy-border bg-[var(--accent-yellow)] rounded-t-xl overflow-hidden relative mt-8 z-10 mb-8">
+        <div class="w-full bg-white border-b-2 border-[var(--border-dark)] p-2 flex items-center">
+            <div class="flex gap-1.5 ml-2">
+                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#ff5f56" stroke="#111" stroke-width="1"/></svg>
+                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#ffbd2e" stroke="#111" stroke-width="1"/></svg>
+                <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#27c93f" stroke="#111" stroke-width="1"/></svg>
+            </div>
+        </div>
+
+        <div class="p-8 md:p-12 flex flex-col items-center text-center">
+            <h2 class="text-4xl md:text-5xl font-black mb-4">7+ Years Mastery</h2>
+            <div class="bg-white heavy-border px-4 py-1 text-lg font-bold shadow-offset-sm inline-block mb-6">
+                Available For Work!
+            </div>
+            <div class="bg-[var(--border-dark)] text-white px-6 py-2 rounded-full font-bold text-lg inline-block border-2 border-transparent">
+                <span class="text-[var(--accent-teal)]">Sri Lanka</span> | Colombo
+            </div>
+        </div>
+        
+        <svg class="absolute -right-4 top-1/2 w-16 h-16 pointer-events-none" viewBox="0 0 100 100">
+            <path d="M10 50 Q 50 10 90 50" fill="none" stroke="#111" stroke-width="2" stroke-dasharray="4 4" />
+        </svg>
+    </div>
+
+    <!-- Action Buttons Placed Below Banner -->
+    <div class="flex flex-col md:flex-row gap-4 w-full justify-center px-4 max-w-2xl mb-12 z-20 relative">
+        <a href="portfolio.html" class="w-full md:w-auto">
+            <button class="w-full bg-[var(--accent-yellow)] heavy-border px-8 py-4 font-black text-[15px] hover:bg-yellow-400 transition-colors shadow-offset active:translate-y-1 active:shadow-none tracking-wide">
+                VIEW PORTFOLIO
+            </button>
+        </a>
+        <a href="mailto:dilshanomega@gmail.com" class="w-full md:w-auto">
+            <button class="w-full bg-white heavy-border px-8 py-4 font-black text-[15px] hover:bg-gray-100 transition-colors shadow-offset active:translate-y-1 active:shadow-none tracking-wide">
+                CONTACT ME
+            </button>
+        </a>
+    </div>
+
+    <!-- ==========================================
+         BLOCK 5: TABBED INTERFACE & TIERS (MOVED HERE)
+         ========================================== -->
+    <div class="w-full max-w-2xl flex flex-col mt-4 relative">
+        <!-- Interactive Tabs Navigation -->
+        <div class="flex w-full px-2 z-10 relative -mb-[2px]" id="service-tabs">
+            <button onclick="openTab('game-design')" id="tab-game-design" class="tab-btn bg-[var(--accent-yellow)] heavy-border rounded-t-lg px-2 sm:px-4 py-2 font-black text-center flex-1 opacity-90 cursor-pointer hover:opacity-100 z-10 transition-all text-xs">
+                Game Design
+            </button>
+            
+            <button onclick="openTab('interior-design')" id="tab-interior-design" class="tab-btn bg-white heavy-border border-b-white rounded-t-lg px-2 sm:px-4 py-2 font-black text-center flex-1 z-20 transition-all text-xs">
+                <span class="border-b-2 border-[var(--accent-teal)] pb-0.5">Interior Design</span>
+            </button>
+            
+            <button onclick="openTab('cgi-vfx')" id="tab-cgi-vfx" class="tab-btn bg-[var(--accent-yellow)] heavy-border rounded-t-lg px-2 sm:px-4 py-2 font-black text-center flex-1 opacity-90 cursor-pointer hover:opacity-100 z-10 transition-all text-xs">
+                CGI & VFX
+            </button>
+        </div>
+
+        <div class="bg-white heavy-border p-5 md:p-6 flex flex-col items-center z-10 relative">
+            <h2 class="text-xl md:text-2xl font-black mb-6 uppercase text-center">SERVICE <span class="text-[var(--accent-teal)]">HIGHLIGHTS</span></h2>
+            
+            <!-- GAME DESIGN TAB CONTENT -->
+            <div id="content-game-design" class="tab-content hidden w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full mb-4">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-[var(--accent-yellow)] heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Environment Art</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Unreal / Unity</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-gray-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Asset Creation</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">High & Low Poly</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-orange-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">PBR Texturing</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Substance Suite</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERIOR DESIGN TAB CONTENT (DEFAULT ACTIVE) -->
+            <div id="content-interior-design" class="tab-content block w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full mb-4">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-[var(--accent-yellow)] heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">ArchViz Rendering</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Sketchup / V-Ray</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-gray-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Custom Furniture</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">High-End Models</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-orange-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Lighting & Mood</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Atmospheric</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CGI & VFX TAB CONTENT -->
+            <div id="content-cgi-vfx" class="tab-content hidden w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full mb-4">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-[var(--accent-yellow)] heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">3D Tracking</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Matchmoving</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-gray-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Dynamics & FX</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Simulations</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="bg-orange-400 heavy-border w-full py-3 px-2 rounded-lg text-center shadow-offset-sm relative">
+                            <p class="font-playful font-bold text-sm text-white tracking-wide text-stroke-base">Compositing</p>
+                            <p class="text-[10px] font-bold mt-0.5 text-gray-900">Post-Production</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-[var(--accent-teal)] heavy-border border-t-0 p-4 flex flex-col items-center z-0 pt-6">
+            <div class="bg-white px-3 py-0.5 font-black text-xs heavy-border mb-3 uppercase text-center">CLIENT SATISFACTION GUARANTEED!</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                <div class="bg-white p-3 heavy-border flex gap-3 items-center">
+                    <div class="w-6 h-6 bg-[var(--accent-teal)] text-white font-black text-xs flex items-center justify-center shrink-0">1</div>
+                    <p class="font-bold text-xs">Fast Turnaround & Clean Topology</p>
+                </div>
+                <div class="bg-white p-3 heavy-border flex gap-3 items-center">
+                    <div class="w-6 h-6 bg-[var(--accent-teal)] text-white font-black text-xs flex items-center justify-center shrink-0">2</div>
+                    <p class="font-bold text-xs">Clear Communication & Daily Updates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to Handle Tabs -->
+    <script>
+        function openTab(tabName) {
+            // Hide all tab content
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => {
+                c.classList.remove('block');
+                c.classList.add('hidden');
+            });
+
+            // Reset all tab buttons to default inactive styles
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => {
+                t.innerHTML = t.textContent.trim();
+                t.className = 'tab-btn bg-[var(--accent-yellow)] heavy-border rounded-t-lg px-2 sm:px-4 py-2 font-black text-center flex-1 opacity-90 cursor-pointer hover:opacity-100 z-10 transition-all text-xs';
+            });
+
+            // Show active content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('content-' + tabName).classList.add('block');
+
+            // Set active button style and wrap text in the active span
+            const activeTab = document.getElementById('tab-' + tabName);
+            const tabText = activeTab.textContent.trim();
+            activeTab.className = 'tab-btn bg-white heavy-border border-b-white rounded-t-lg px-2 sm:px-4 py-2 font-black text-center flex-1 z-20 transition-all text-xs';
+            activeTab.innerHTML = `<span class="border-b-2 border-[var(--accent-teal)] pb-0.5">${tabText}</span>`;
+        }
+    </script>
+
+    <!-- ==========================================
+         BLOCK 4: OVERLAPPING INFO BOXES CONTAINER
+         ========================================== -->
+    <div class="w-full max-w-4xl flex flex-col items-center z-10">
+        
+        <!-- ROW 1: TOOLS & ENGINES / ACHIEVEMENTS & AVAILABILITY -->
+        <div class="flex flex-col md:flex-row w-full relative justify-center items-start px-2 md:pl-10">
+            <div class="relative w-full md:w-[48%] z-0">
+                <div class="absolute -bottom-6 -right-6 w-full h-full border-2 border-[var(--border-dark)] -z-20" style="background-image: repeating-linear-gradient(45deg, #d1d5db 25%, transparent 25%, transparent 75%, #d1d5db 75%, #d1d5db), repeating-linear-gradient(45deg, #d1d5db 25%, #ffffff 25%, #ffffff 75%, #d1d5db 75%, #d1d5db); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+                
+                <div class="selection-box w-full p-6 md:p-8 flex flex-col gap-6 shadow-sm bg-white">
+                    <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                    <div class="node node-ml"></div><div class="node node-mr"></div>
+                    <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+                    <div>
+                        <div class="bg-[var(--accent-teal)] heavy-border px-4 py-1 inline-block mb-4 relative shadow-offset-sm">
+                            <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                            <h3 class="font-black text-white text-lg tracking-wide uppercase text-stroke-base">Tools & Engines</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs md:text-sm font-extrabold capitalize">
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">unreal engine</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">blender</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">3ds max</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">substance painter</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">substance designer</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">zbrush</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">marmoset</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">rizom uv</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">adobe suite</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">sketchup</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">lumion</div>
+                            <div class="bg-gray-100 heavy-border px-2 py-1.5 rounded shadow-offset-sm">d5 render</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selection-box w-full md:w-[58%] p-6 md:p-8 flex flex-col mt-8 md:mt-12 md:-ml-8 z-10 relative bg-white">
+                <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                <div class="node node-ml"></div><div class="node node-mr"></div>
+                <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+                <div class="bg-[var(--accent-teal)] heavy-border px-4 py-1 inline-block mb-3 relative shadow-offset-sm self-start">
+                    <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                    <h3 class="font-black text-white text-lg tracking-wide uppercase text-stroke-base">Achievements</h3>
+                </div>
+                <ul class="font-bold text-xs md:text-sm tracking-tight mb-6 flex flex-col gap-2">
+                    <li class="flex items-center gap-2">
+                        <span class="text-[var(--accent-teal)]">✦</span> Worked with 2K+ international clients on Fiverr
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="text-[var(--accent-teal)]">✦</span> Completed complex projects across multiple industries
+                    </li>
+                </ul>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t-2 border-dashed border-gray-300 pt-4">
+                    <div>
+                        <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-2 relative shadow-offset-sm">
+                            <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                            <h4 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Availability</h4>
+                        </div>
+                        <ul class="font-bold text-xs md:text-sm tracking-tight flex flex-col gap-1">
+                            <li>• Remote</li>
+                            <li>• Hybrid</li>
+                            <li>• Relocation open</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-2 relative shadow-offset-sm">
+                            <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                            <h4 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Languages</h4>
+                        </div>
+                        <ul class="font-bold text-xs md:text-sm tracking-tight flex flex-col gap-1">
+                            <li>• English - Fluent</li>
+                            <li>• Sinhala - Native</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-6 font-bold text-sm tracking-tight">
+                    Currently open for <span class="bg-[var(--accent-teal)] text-white px-1.5 py-0.5 heavy-border inline-block text-stroke-thin">Freelance & Full-time</span> opportunities.
+                </div>
+
+                <svg class="absolute -bottom-4 right-1/3 w-8 h-10 pointer-events-none drop-shadow-md" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="1.5">
+                    <path d="M4 2 L11 22 L14 15 L21 12 Z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- NEW BOX SECTION: WHY WORK WITH ME -->
+        <div class="w-full px-2 mt-12 mb-4 relative z-10">
+            <div class="selection-box w-full p-6 md:p-8 flex flex-col items-center text-center shadow-sm z-10 bg-white">
+                <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                <div class="node node-ml"></div><div class="node node-mr"></div>
+                <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+                <div class="bg-[var(--accent-teal)] heavy-border px-6 py-1.5 shadow-offset-sm inline-block mb-6 relative">
+                    <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                    <h3 class="font-black text-white text-2xl tracking-wide uppercase text-stroke-base">Why Work With Me?</h3>
+                </div>
+                <p class="font-bold text-sm md:text-base leading-relaxed max-w-3xl text-[var(--border-dark)] px-4">
+                    With over 7 years of hands on experience as a 3D Generalist, I bring concepts to life across gaming, animation, and architectural visual environments. Having delivered high-tier results to 2000+ global clients, I prioritize high visual quality, efficient UV layout, and optimized game ready assets.
+                </p>
+            </div>
+        </div>
+
+        <!-- ROW 2 (COMBINED): AI TOOLS & EDUCATION HORIZONTAL TILE -->
+        <div class="w-full px-2 mt-8 md:mt-12 mb-12 relative">
+            <div class="selection-box w-full p-6 md:p-8 flex flex-col md:flex-row gap-8 shadow-sm z-10 bg-white">
+                <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                <div class="node node-ml"></div><div class="node node-mr"></div>
+                <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+                <!-- Left Column: AI Tools I Use -->
+                <div class="flex-1 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-gray-300 pb-8 md:pb-0 md:pr-8">
+                    <div class="bg-[var(--accent-teal)] heavy-border px-4 py-1 inline-block mb-6 relative shadow-offset-sm">
+                        <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                        <h3 class="font-black text-white text-lg tracking-wide uppercase text-stroke-base">AI Tools I Use</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-xs md:text-sm font-extrabold">
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">Higgsfield</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">Planner 5D</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">Midjourney</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">Spacely AI</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">Interior AI</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center">ComfyUI</div>
+                        <div class="bg-gray-100 heavy-border px-3 py-2 rounded shadow-offset-sm flex items-center justify-center text-center col-span-2 sm:col-span-1">Krea</div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Education -->
+                <div class="flex-1 flex flex-col pt-2 md:pt-0 md:pl-2">
+                    <div class="bg-[var(--accent-teal)] heavy-border px-4 py-1 inline-block mb-6 relative shadow-offset-sm self-start">
+                        <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                        <h3 class="font-black text-white text-lg tracking-wide uppercase text-stroke-base">Education</h3>
+                    </div>
+                    
+                    <div class="w-full flex flex-col gap-4 text-left justify-center h-full">
+                        <div class="bg-gray-50 p-4 heavy-border rounded shadow-offset-sm">
+                            <h4 class="font-black text-[17px] text-[var(--border-dark)] leading-tight mb-1">AMDT School of Creativity - 2022</h4>
+                            <p class="font-bold text-[13px] text-[var(--accent-teal)] tracking-wide text-stroke-thin">3D Animation & VFX BTEC HND (Pearson UK)</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-3 heavy-border rounded shadow-offset-sm">
+                                <h5 class="font-black text-sm">GCE Advanced Level - 2017</h5>
+                            </div>
+                            <div class="bg-gray-50 p-3 heavy-border rounded shadow-offset-sm">
+                                <h5 class="font-black text-sm">GCE Ordinary Level - 2014</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW SECTION: HOBBIES & INTERESTS -->
+        <div class="w-full px-2 mb-16 relative z-10">
+            <div class="selection-box w-full p-6 md:p-8 flex flex-col shadow-sm z-10 bg-white">
+                <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+                <div class="node node-ml"></div><div class="node node-mr"></div>
+                <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+                <div class="bg-[var(--accent-teal)] heavy-border px-6 py-1.5 inline-block mb-8 relative shadow-offset-sm self-center">
+                    <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                    <h2 class="font-black text-white text-xl md:text-2xl tracking-wide uppercase text-stroke-base">Hobbies & Interests</h2>
+                </div>
+
+                <!-- Tags Container -->
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Growing Mushrooms</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Gardening</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Self-Sustaining Living</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Gaming</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Home Labing</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Watching Movies</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Listening to Music</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Filmmaking</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">YouTube</div>
+                    <div class="bg-gray-100 heavy-border px-3 py-1.5 rounded shadow-offset-sm font-bold text-xs md:text-sm">Camping</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t-2 border-dashed border-gray-300 pt-8">
+                    <!-- Column 1: Explanations -->
+                    <div class="flex flex-col gap-6 border-b-2 md:border-b-0 md:border-r-2 border-dashed border-gray-300 pb-8 md:pb-0 md:pr-8">
+                        <div>
+                            <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-3 relative shadow-offset-sm">
+                                <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                                <h3 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Mushroom Farming</h3>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 leading-relaxed">
+                                Cultivating various species of mushrooms from scratch. It involves learning about mycology, managing sterile environments, and finding the perfect delicate balance of humidity and temperature to watch them grow successfully.
+                            </p>
+                        </div>
+                        <div>
+                            <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-3 relative shadow-offset-sm">
+                                <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                                <h3 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Home Labing</h3>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 leading-relaxed">
+                                Building and managing personal servers and networking equipment right at home. It allows me to self host services, experiment with new software/technologies, and maintain my own custom IT infrastructure for continuous learning.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Gaming -->
+                    <div class="flex flex-col gap-6 md:pl-2">
+                        <div>
+                            <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-3 relative shadow-offset-sm">
+                                <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                                <h3 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Favorite Games</h3>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-700 mb-2">Games I absolutely love spending hours playing:</p>
+                            <ul class="font-bold text-sm tracking-tight flex flex-col gap-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="text-[var(--accent-teal)]">✦</span> Ark Survival Evolved
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="text-[var(--accent-teal)]">✦</span> The Forest
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="text-[var(--accent-teal)]">✦</span> Minecraft
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <div class="bg-[var(--accent-teal)] heavy-border px-3 py-0.5 inline-block mb-3 relative shadow-offset-sm">
+                                <div class="absolute top-1 left-1 w-full h-full bg-white -z-10 heavy-border"></div>
+                                <h3 class="font-black text-white text-sm tracking-wide uppercase text-stroke-thin">Most Anticipated</h3>
+                            </div>
+                            <div class="bg-gray-50 p-4 heavy-border rounded shadow-offset-sm mt-1 border-l-4 border-l-[var(--accent-teal)]">
+                                <h4 class="font-black text-[16px] text-[var(--border-dark)] leading-tight mb-1">Light No Fire</h4>
+                                <p class="font-bold text-xs text-[var(--accent-teal)] tracking-wide text-stroke-thin">by Hello Games</p>
+                                <p class="text-[13px] font-semibold text-gray-600 mt-2">I am super pumped about this upcoming release!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         BLOCK 6: PROMO / SHARE BLOCK 
+         ========================================== -->
+    <div class="w-full max-w-2xl flex flex-col items-center text-center mt-8">
+        <div class="bg-[var(--accent-pink)] heavy-border px-8 py-3 mb-6 relative">
+            <div class="absolute top-2 -left-2 w-full h-full bg-white -z-10 heavy-border"></div>
+            <h2 class="font-black text-xl md:text-2xl tracking-wide flex items-center justify-center gap-2 uppercase">
+                LET'S WORK TOGETHER
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 19"/></svg>
+            </h2>
+        </div>
+
+        <p class="font-bold text-sm md:text-base mb-2">Reach out via email or message for custom 3D design quotes</p>
+        <p class="font-black bg-white border border-black px-2 py-0.5 mb-8 inline-block shadow-offset-sm transform -rotate-1">Available for Remote, Hybrid & Relocation Projects</p>
+
+        <div class="w-40 h-48 bg-white heavy-border mb-6 flex items-center justify-center rounded-xl overflow-hidden p-1 shadow-offset-sm">
+            <img src="portrait.png" alt="Dilshan Yapa Profile" class="w-full h-full object-cover rounded-lg" onerror="this.src='aboutmemainimg.webp'" />
+        </div>
+
+        <p class="font-bold text-lg mb-1">Dilshan Yapa - 3D Generalist</p>
+        <p class="font-semibold text-xs text-gray-600 mb-8">*Pixels polygons and a bit of magic</p>
+
+        <div class="flex flex-wrap gap-4 justify-center relative">
+            <div class="absolute -top-6 -right-6 bg-[var(--accent-teal)] heavy-border w-10 h-10 flex items-center justify-center rounded-t-lg rounded-bl-lg rounded-br-sm shadow-offset-sm z-10">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            
+            <a href="https://www.instagram.com/s.o.t.a_/" target="_blank">
+                <button class="bg-[var(--accent-pink)] heavy-border px-8 py-3 rounded-full font-black hover:bg-pink-400 transition-colors shadow-offset-sm active:translate-y-1 active:shadow-none">
+                    Send Direct Message
+                </button>
+            </a>
+            <a href="downloads/DilshanYapa_CV.pdf" target="_blank">
+                <button class="bg-white heavy-border px-8 py-3 rounded-full font-black hover:bg-gray-100 transition-colors shadow-offset-sm active:translate-y-1 active:shadow-none">
+                    Download Resume
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         BLOCK 7: FAQ ACCORDION
+         ========================================== -->
+    <div class="w-full max-w-3xl mt-16 mb-12 relative">
+        <div class="absolute -top-8 -left-6 z-20">
+            <svg width="60" height="70" viewBox="0 0 60 70" fill="white" stroke="#111" stroke-width="2">
+                <rect x="10" y="5" width="40" height="50" fill="white" />
+                <rect x="5" y="10" width="40" height="50" fill="white" />
+                <path d="M0 15 h 20 l 5 5 h 25 v 45 h -50 z" fill="white" />
+                <line x1="10" y1="25" x2="40" y2="25" />
+                <line x1="10" y1="35" x2="35" y2="35" />
+                <line x1="10" y1="45" x2="40" y2="45" />
+            </svg>
+        </div>
+
+        <div class="bg-white heavy-border p-8 pt-10 shadow-offset relative z-10">
+            <h2 class="text-2xl font-black text-center text-[var(--accent-teal)] mb-8 uppercase tracking-wide">
+                Frequently Asked Questions
+            </h2>
+
+            <div class="flex flex-col border-t-2 border-[var(--border-dark)]">
+                <details class="group cursor-pointer border-b-2 border-gray-200 py-4">
+                    <summary class="font-bold flex items-center justify-between hover:text-[var(--accent-teal)] transition-colors">
+                        <span class="flex items-center gap-3"><span class="text-[var(--accent-teal)]">Q1</span> What software engines do you specialize in?</span>
+                        <svg class="w-5 h-5 text-[var(--accent-teal)] group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </summary>
+                    <div class="pt-4 pl-8 text-sm font-medium text-gray-600">
+                        I primarily use Unreal Engine, Blender, 3ds Max, Substance Painter, Substance Designer, ZBrush, Marmoset Toolbag, and RizomUV.
+                    </div>
+                </details>
+
+                <details class="group cursor-pointer border-b-2 border-gray-200 py-4">
+                    <summary class="font-bold flex items-center justify-between hover:text-[var(--accent-teal)] transition-colors">
+                        <span class="flex items-center gap-3"><span class="text-[var(--accent-teal)]">Q1</span> Are you open to full-time or contract roles?</span>
+                        <svg class="w-5 h-5 text-[var(--accent-teal)] group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </summary>
+                    <div class="pt-4 pl-8 text-sm font-medium text-gray-600">
+                        Yes! I am available for Remote, Hybrid, and open to relocation opportunities globally.
+                    </div>
+                </details>
+
+                <details class="group cursor-pointer border-b-2 border-gray-200 py-4">
+                    <summary class="font-bold flex items-center justify-between hover:text-[var(--accent-teal)] transition-colors">
+                        <span class="flex items-center gap-3"><span class="text-[var(--accent-teal)]">Q3</span> What file formats do you deliver?</span>
+                        <svg class="w-5 h-5 text-[var(--accent-teal)] group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </summary>
+                    <div class="pt-4 pl-8 text-sm font-medium text-gray-600">
+                        I deliver standard industry formats including FBX, OBJ, BLEND, MAX, UASSET, PNG/TGA maps, or custom project files depending on requirements.
+                    </div>
+                </details>
+
+                <details class="group cursor-pointer border-b-2 border-gray-200 py-4">
+                    <summary class="font-bold flex items-center justify-between hover:text-[var(--accent-teal)] transition-colors">
+                        <span class="flex items-center gap-3"><span class="text-[var(--accent-teal)]">Q4</span> Do you use AI in your workflow?</span>
+                        <svg class="w-5 h-5 text-[var(--accent-teal)] group-open:rotate-45 transition-transform" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </summary>
+                    <div class="pt-4 pl-8 text-sm font-medium text-gray-600 leading-relaxed">
+                        Yes. I implement AI tools where they are efficient, such as to reduce manual labor or cut down render times, so I can deliver high quality results to my clients faster. I maintain a professional standard and always inform clients of my workflow beforehand. While AI is becoming prevalent in industries like 3D, VFX, and image generation, I believe in using it strictly as a supportive tool rather than letting it take over entirely, ensuring I retain full creative freedom over the final product.
+                    </div>
+                </details>
+
+            </div>
+        </div>
+
+        <div class="flex justify-center -mt-6 relative z-30">
+            <button class="bg-[var(--accent-teal)] heavy-border px-10 py-3 font-black text-lg flex items-center gap-2 hover:bg-teal-300 transition-colors shadow-offset active:translate-y-1 active:shadow-none">
+                Start A Project
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="black"><path d="M5 3l14 9-14 9z"/></svg>
+            </button>
+            
+            <svg class="absolute -bottom-10 -right-2 w-12 h-12" viewBox="0 0 24 24" fill="white" stroke="#111" stroke-width="1.5">
+
+            </svg>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         FOOTER (MATCHING SCREENSHOT 1 & SOCIALS)
+         ========================================== -->
+    <footer class="w-full max-w-4xl mb-8 relative z-10">
+        <div class="selection-box w-full p-8 md:p-10 bg-white heavy-border shadow-offset">
+            <div class="node node-tl"></div><div class="node node-tc"></div><div class="node node-tr"></div>
+            <div class="node node-ml"></div><div class="node node-mr"></div>
+            <div class="node node-bl"></div><div class="node node-bc"></div><div class="node node-br"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b-2 border-dashed border-gray-300">
+                <!-- Column 1: Bio & Socials -->
+                <div class="flex flex-col gap-4 md:col-span-1">
+                    <h3 class="font-black text-lg uppercase tracking-wide text-[var(--border-dark)]">Dilshan Yapa</h3>
+                    <p class="text-xs md:text-sm font-semibold text-gray-700 leading-relaxed">
+                        An independent 3D artist with a deep appreciation for detail, mood, and visual balance in every piece. Based in Colombo, Sri Lanka
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <div class="social-icon-wrapper">
+                            <span class="social-tooltip">facebook</span>
+                            <a href="https://www.facebook.com/itsmedilshanyapa/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-[#222222] bg-[#141414] flex items-center justify-center hover:border-gray-600 hover:bg-[#1f1f1f] hover:scale-105 transition-all duration-300 group"><svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7.5v4H10v12h4v-12z"/></svg></a>
+                        </div>
+                        <div class="social-icon-wrapper">
+                            <span class="social-tooltip">instagram</span>
+                            <a href="https://www.instagram.com/s.o.t.a_/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-[#222222] bg-[#141414] flex items-center justify-center hover:border-gray-600 hover:bg-[#1f1f1f] hover:scale-105 transition-all duration-300 group"><svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                        </div>
+                        <div class="social-icon-wrapper">
+                            <span class="social-tooltip">artstation</span>
+                            <a href="https://www.artstation.com/chamodyapa" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-[#222222] bg-[#141414] flex items-center justify-center hover:border-gray-600 hover:bg-[#1f1f1f] hover:scale-105 transition-all duration-300 group"><svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M0 17.75l3.5 6h17l-3.5-6H0zm18.5-13.5L12 6.5 5.5 4.25 2 10.5h20l-3.5-6.25zM12 9.5l4.5 7.75h-9L12 9.5z"/></svg></a>
+                        </div>
+                        <div class="social-icon-wrapper">
+                            <span class="social-tooltip">github</span>
+                            <a href="https://github.com/nutinab" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-[#222222] bg-[#141414] flex items-center justify-center hover:border-gray-600 hover:bg-[#1f1f1f] hover:scale-105 transition-all duration-300 group"><svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+                        </div>
+                        <div class="social-icon-wrapper">
+                            <span class="social-tooltip">linkedin</span>
+                            <a href="https://www.linkedin.com/in/dilshan-yapa-316870148" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full border border-[#222222] bg-[#141414] flex items-center justify-center hover:border-gray-600 hover:bg-[#1f1f1f] hover:scale-105 transition-all duration-300 group"><svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Services -->
+                <div class="flex flex-col gap-2">
+                    <h3 class="font-black text-sm uppercase tracking-wide text-[var(--border-dark)] mb-1">Services</h3>
+                    <ul class="flex flex-col gap-1.5 text-xs font-bold text-gray-700">
+                        <li>Environment Design</li>
+                        <li>3D Product Rendering</li>
+                        <li>Interior Design</li>
+                        <li>Tailored 3D & VFX Solutions</li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Contact / Links -->
+                <div class="flex flex-col gap-2">
+                    <h3 class="font-black text-sm uppercase tracking-wide text-[var(--border-dark)] mb-1">Contact</h3>
+                    <ul class="flex flex-col gap-1.5 text-xs font-bold text-gray-700">
+                        <li><a href="mailto:dilshanomega@gmail.com" class="hover:text-[var(--accent-teal)] transition-colors">dilshanomega@gmail.com</a></li>
+                        <li><a href="about.html" class="hover:text-[var(--accent-teal)] transition-colors">About</a></li>
+                        <li><a href="portfolio.html" class="hover:text-[var(--accent-teal)] transition-colors">Portfolio</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-6 text-center text-xs font-bold uppercase tracking-wider text-gray-700">
+                &copy; 2026 xolotl labs. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

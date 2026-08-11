@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Dilshan Yapa</title>
+    
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           GLOBAL COLOR PALETTE & VARIABLES
+           ========================================= */
+        :root {
+            --bg-rich-black: #0D0D10;
+            --surface-charcoal: #17171D;
+            --primary-raspberry: #FA003F;
+            --bright-raspberry: #E91E63;
+            --highlight-sky: #E0F2FE;
+            --text-main: #F5F5F7;
+            --text-secondary: #A8ABB3;
+            --border-dark: #2A2A32;
+            
+            --font-display: 'Inter', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+            --font-hand: 'Caveat', cursive;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-rich-black);
+            color: var(--text-main);
+            font-family: var(--font-display);
+            overflow-x: hidden;
+            display: block; 
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* =========================================
+           LOADER & NAVIGATION STYLES
+           ========================================= */
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-rich-black);
+            z-index: 9999;
+            transition: opacity 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #anim-logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: clamp(3rem, 8vw, 5rem);
+            color: var(--text-main);
+            z-index: 10000;
+            pointer-events: none;
+            letter-spacing: -0.04em;
+            transition: top 1s cubic-bezier(0.76, 0, 0.24, 1),
+                        left 1s cubic-bezier(0.76, 0, 0.24, 1),
+                        font-size 1s cubic-bezier(0.76, 0, 0.24, 1),
+                        opacity 0.3s ease;
+            will-change: top, left, font-size;
+        }
+
+        .main-nav {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9990;
+            background-color: rgba(23, 23, 29, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-dark);
+            border-radius: 9999px;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 650px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .main-nav.ready {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex: 1;
+        }
+        
+        .nav-group.left { justify-content: flex-end; padding-right: 2rem; }
+        .nav-group.right { justify-content: flex-start; padding-left: 2rem; }
+
+        .brand-container {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-link {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+        }
+
+        .nav-link.active {
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-raspberry);
+            border-radius: 2px;
+        }
+
+        .logo-swap {
+            color: var(--text-main);
+            text-decoration: none;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            width: 80px; 
+            text-align: center;
+            display: inline-block;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-swap::after { content: "xolotl"; transition: color 0.3s ease; }
+        .logo-swap:hover::after { content: "studio"; color: var(--primary-raspberry); }
+
+        /* =========================================
+           FIXED BACKGROUNDS
+           ========================================= */
+        .grid-background {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                linear-gradient(var(--border-dark) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-dark) 1px, transparent 1px);
+            background-size: 60px 60px;
+            background-position: center;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        .grid-fade {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, transparent 20%, var(--bg-rich-black) 90%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           FLUID CATEGORY FILTER BUTTONS
+           ========================================= */
+        .filter-btn {
+            background-color: var(--surface-charcoal);
+            border: 1px solid var(--border-dark);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.6rem 1.25rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: #444;
+            color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-raspberry);
+            border-color: var(--primary-raspberry);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(250, 0, 63, 0.3);
+            font-weight: 700;
+        }
+
+        /* =========================================
+           FLUID SHOWCASE CARDS
+           ========================================= */
+        .portfolio-card {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background-color: var(--surface-charcoal);
+            border: 1px solid var(--border-dark);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+            cursor: pointer;
+        }
+
+        .portfolio-card.is-hidden {
+            display: none;
+        }
+
+        .portfolio-card .img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .portfolio-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+        }
+
+        .portfolio-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .portfolio-card .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(13, 13, 16, 0.95) 0%, rgba(13, 13, 16, 0.3) 50%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem;
+            opacity: 0.9;
+            transition: opacity 0.4s ease;
+        }
+
+        .portfolio-card:hover {
+            border-color: rgba(245, 245, 247, 0.4);
+            box-shadow: 0 10px 30px -5px rgba(245, 245, 247, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .category-badge {
+            background: var(--primary-raspberry);
+            border: 1px solid var(--primary-raspberry);
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            width: max-content;
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           MODAL (ZOOMED VIEW) STYLES
+           ========================================= */
+        #portfolio-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(13, 13, 16, 0.98);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        #portfolio-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .main-nav { padding: 0.75rem 1rem; max-width: 95%; }
+            .nav-group { gap: 1rem; }
+            .nav-group.left { padding-right: 1rem; }
+            .nav-group.right { padding-left: 1rem; }
+            .nav-link { font-size: 0.65rem; }
+            .portfolio-card .card-overlay { padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         PAGE LOADER & ANIMATED LOGO
+         ========================================== -->
+    <div id="page-loader"></div>
+    <div id="anim-logo">xolotl</div>
+
+    <!-- ==========================================
+         NAVIGATION BAR
+         ========================================== -->
+    <nav id="main-nav" class="main-nav">
+        <div class="nav-group left">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="portfolio.html" class="nav-link active">Portfolio</a>
+        </div>
+        <div class="brand-container">
+            <a href="index.html" id="target-logo" class="logo-swap"></a>
+        </div>
+        <div class="nav-group right">
+            <a href="index.html#services" class="nav-link">Services</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+    </nav>
+
+    <!-- GLOBAL FIXED BACKGROUND -->
+    <div class="grid-background"></div>
+    <div class="grid-fade"></div>
+
+    <!-- ==========================================
+         PORTFOLIO HERO & FILTER HEADER
+         ========================================== -->
+    <section class="relative z-20 pt-36 pb-12 px-4 sm:px-6 lg:px-12 max-w-[1440px] mx-auto">
+        <div class="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#E0F2FE]/5 blur-[140px] rounded-full pointer-events-none"></div>
+
+        <div class="flex flex-col items-center text-center max-w-3xl mx-auto mb-12 reveal-on-scroll">
+            <div class="inline-flex items-center gap-2 bg-[#17171D] border border-[#2A2A32] rounded-full px-4 py-1.5 mb-4">
+                <span class="w-2 h-2 rounded-full bg-[#FA003F] animate-pulse"></span>
+                <span class="text-[11px] font-semibold text-[#E0F2FE] uppercase tracking-widest">Selected Archives</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#F5F5F7] uppercase mb-4">
+                Visual <span class="font-serif italic text-[#FA003F] font-normal lowercase">Gallery</span>
+            </h1>
+            <p class="text-[#A8ABB3] text-sm sm:text-base leading-relaxed">
+                An immersive showcase of environments, spatial concepts, photorealistic product renders, and digital art crafted with precision.
+            </p>
+        </div>
+
+        <!-- Filter Buttons Sorted -->
+        <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-16 reveal-on-scroll">
+            <button class="filter-btn active" data-filter="all">All Works</button>
+            <button class="filter-btn" data-filter="int">Interior Design</button>
+            <button class="filter-btn" data-filter="env">Environment Design</button>
+            <button class="filter-btn" data-filter="pr">Product Rendering</button>
+            <button class="filter-btn" data-filter="vfx">Tailored 3D & VFX</button>
+            <button class="filter-btn" data-filter="il">Concept Art & Illustration</button>
+        </div>
+
+        <!-- ==========================================
+             FLUID SHOWCASE GRID (ALL ITEMS)
+             ========================================== -->
+        <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 min-h-[600px]">
+
+            <!-- INTERIOR DESIGN (int1 - int8) -->
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="int" data-image="portfolio/int1.webp" data-title="Nordic Living Spatial" data-desc="A warm contemporary interior combining rich timber cabinetry, natural stone, and softly curved furniture to create a refined but comfortable living space. The layered lighting, integrated joinery, and earthy palette draw from current luxury residential trends while keeping the overall design understated.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int1.webp" alt="int1" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">Nordic Living Spatial</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="int" data-image="portfolio/int2.webp" data-title="Minimalist Concrete Loft" data-desc="A restrained modern interior built around concrete surfaces, clean architectural lines, and carefully integrated storage. Warm timber accents, concealed LED lighting, and soft furnishings balance the harder materials, reflecting the contemporary trend toward softened industrial and minimalist interiors.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int2.webp" alt="int2" onerror="this.src='https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">Minimalist Concrete Loft</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-3 h-[320px]" data-category="int" data-image="portfolio/int3.webp" data-title="Contemporary Open Kitchen" data-desc="A contemporary open-plan kitchen combining pale cabinetry, natural timber, marble surfaces, and woven furniture for a clean yet welcoming character. The restrained material palette and integrated lighting follow current trends in warm minimalism, where functional kitchen spaces are designed to blend naturally with the living environment.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int3.webp" alt="int3" onerror="this.src='https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=600&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-lg font-bold text-white mb-2">Contemporary Kitchen</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-3 h-[320px]" data-category="int" data-image="portfolio/int4.webp" data-title="Minimalist Dining Suite" data-desc="An organic modern dining space centred around sculptural furniture, curved architectural forms, and a neutral material palette. Woven pendant lighting, natural timber, and integrated shelving introduce warmth and texture, following the current move toward softer, more tactile interpretations of minimalism.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int4.webp" alt="int4" onerror="this.src='https://images.unsplash.com/photo-1617806118233-18e1c0c9aa23?q=80&w=600&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-lg font-bold text-white mb-2">Minimalist Dining Suite</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-3 h-[320px]" data-category="int" data-image="portfolio/int5.webp" data-title="Contemporary Luxury Residence" data-desc="A contemporary luxury interior combining generous glazing, marble surfaces, refined joinery, and muted green cabinetry within an open-plan living environment. The design draws on transitional influences while using clean detailing, natural materials, and restrained ornamentation to create a sophisticated modern residential aesthetic.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int5.webp" alt="int5" onerror="this.src='https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=600&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-lg font-bold text-white mb-2">Contemporary Luxury Residence</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-3 h-[320px]" data-category="int" data-image="portfolio/int6.webp" data-title="Luxury Suburban Villa" data-desc="A high end contemporary villa defined by expressive curved forms, expansive glazing, and integrated architectural lighting. The sculptural façade combines crisp geometric volumes with softer organic edges, reflecting a growing architectural trend toward fluid modernism and highly integrated indoor-outdoor living.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int6.webp" alt="int6" onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=600&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-lg font-bold text-white mb-2">Luxury Suburban Villa</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[380px]" data-category="int" data-image="portfolio/int7.webp" data-title="Warm Urban Apartment" data-desc="A warm modern living space built around natural timber, soft upholstery, muted earthy tones, and carefully selected mid-century-inspired furniture. Strong daylight, layered textures, and a restrained decorative approach create a relaxed residential character while maintaining the clean proportions of contemporary apartment design.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int7.webp" alt="int7" onerror="this.src='https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Warm Urban Apartment</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[380px]" data-category="int" data-image="portfolio/int8.webp" data-title="Contemporary Japandi Bedroom" data-desc="A calm contemporary bedroom influenced by Japandi design, combining natural timber panelling, low-profile furniture, soft textiles, and warm ambient lighting. The restrained palette and emphasis on tactile materials create a quiet, intimate atmosphere characteristic of modern minimalist bedroom interiors.">
+                <div class="img-wrapper">
+                    <img src="portfolio/int8.webp" alt="int8" onerror="this.src='https://images.unsplash.com/photo-1616594039964-ae9021a400a0?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Interior Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-xl font-bold text-white mb-2">Contemporary Japandi Bedroom</h3></div>
+                </div>
+            </div>
+
+            <!-- ENVIRONMENTS (env1 - env8) -->
+            <div class="portfolio-card md:col-span-8 h-[400px] sm:h-[500px]" data-category="env" data-image="portfolio/env1.webp" data-title="Enchanted Woodland Sanctuary" data-desc="RA stylized fantasy woodland environment built around dense vegetation, oversized willow trees, rolling terrain, and a small timber-and-stone cottage integrated into the landscape. Saturated greens, warm wood tones, wildflowers, and soft atmospheric lighting give the scene a whimsical storybook quality while maintaining a strong sense of depth and environmental storytelling.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env1.webp" alt="env1" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl sm:text-3xl font-bold text-white mb-2">Enchanted Woodland Sanctuary</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[400px] sm:h-[500px]" data-category="env" data-image="portfolio/env2.webp" data-title="Verdant Fantasy Valley" data-desc="A vibrant fantasy landscape combining a winding stream, meadow vegetation, timber cottages, and distant windmills within a cohesive pastoral setting. The exaggerated foliage, saturated greens, turquoise water, and bright blue sky create a colourful stylized aesthetic suited to a real-time game environment, with the composition designed to guide the eye naturally through the valley.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env2.webp" alt="env2" onerror="this.src='https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-2xl font-bold text-white mb-2">Verdant Fantasy Valley</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env3.webp" data-title="Whimsical Windmill Hamlet" data-desc="A stylized European-inspired fantasy environment featuring timber-frame architecture, working windmills, rolling grasslands, and colourful seasonal vegetation. The hand-crafted shapes, simplified materials, and strong contrast between vivid green fields and warm autumnal foliage create a playful visual style with a distinctly storybook character.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env3.webp" alt="env3" onerror="this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Whimsical Windmill Hamlet</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env4.webp" data-title="Hand-Painted Viking Shield" data-desc="A stylized Viking prop designed around chunky wooden construction, reinforced metal plates, rope bindings, and hand-painted decorative markings. Exaggerated proportions, simplified forms, and warm earthy colours give the asset a handcrafted game-art quality, while the worn edges and painted details add character without relying on realistic surface complexity.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env4.webp" alt="env4" onerror="this.src='https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-xl font-bold text-white mb-2">Hand-Painted Viking Shield</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env5.webp" data-title="Whimsical Retro Terminal" data-desc="A stylized retro-futurist prop combining a chunky CRT display with carved timber components, exposed cables, organic growth, and playful accessories. The design mixes nostalgic computer hardware with fantasy elements through rounded forms, warm wood, muted metal, and bright cyan display lighting, giving the asset a quirky handcrafted identity.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env5.webp" alt="env5" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-xl font-bold text-white mb-2">Whimsical Retro Terminal</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env6.webp" data-title="Stylized Medieval Market Stall" data-desc="A modular medieval market environment built from rough timber frames, canvas awnings, wooden crates, barrels, baskets, and simple produce props. The hand-painted materials and deliberately simplified geometry create a cohesive fantasy RPG aesthetic, with warm wood, muted fabric, and earthy food colours reinforcing the rustic character of the setting.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env6.webp" alt="env6" onerror="this.src='https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Stylized Medieval Market Stall</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env7.webp" data-title="Lush Woodland Meadow" data-desc="A stylized natural environment focused on layered vegetation, open grassland, mature trees, and subtle variations in foliage density. The palette moves through cool greens and turquoise tones with small accents of white and warm flowers, while soft atmospheric lighting and distant tree layers create depth without relying on highly realistic textures.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env7.webp" alt="env7" onerror="this.src='https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Lush Woodland Meadow</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[380px]" data-category="env" data-image="portfolio/env8.webp" data-title="Stylized Autumn Tree Collection" data-desc="A stylized collection of deciduous trees designed with exaggerated silhouettes, simplified foliage clusters, and distinctive autumn colour variation. The bright greens, oranges, reds, and yellows create a vibrant fantasy palette, while the hand-crafted forms and layered foliage are suited to colorful real-time environments and game worlds.">
+                <div class="img-wrapper">
+                    <img src="portfolio/env8.webp" alt="env8" onerror="this.src='https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Environment Design</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Stylized Autumn Tree Collection</h3></div>
+                </div>
+            </div>
+
+            <!-- ILLUSTRATION & CONCEPT ART (il1, il2, il4, il5) -->
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="il" data-image="portfolio/il1.webp" data-title="Midnight Wanderer" data-desc="Stylized fantasy environment illustration built around a dark teal and cyan nocturnal palette, with intense luminous blue elements creating strong focal points throughout the scene. Soft mist, glowing particles, waterfalls, ancient stone structures, and oversized environmental silhouettes create a mysterious, magical atmosphere. The layered foreground rocks, central ruins, and deep forest background give the composition a strong sense of spatial depth and scale, while the cool lighting and isolated highlights create a feeling of discovery and quiet tension.">
+                <div class="img-wrapper">
+                    <img src="portfolio/il1.webp" alt="il1" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Concept Art</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">Midnight Wanderer</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="il" data-image="portfolio/il2.webp" data-title="Cyber Shaman Ritual" data-desc="A cinematic fantasy illustration blending dark navy, turquoise, electric cyan, and subtle crimson accents into a supernatural cyberpunk atmosphere. The towering central structure and silhouetted figures establish a strong vertical focal point, surrounded by floating stone fragments, glowing particles, vegetation, and futuristic energy. The symmetrical composition and dramatic lighting create a ritualistic, monumental feeling, while the contrast between ancient natural forms and technological elements gives the scene an otherworldly sense of mystery.">
+                <div class="img-wrapper">
+                    <img src="portfolio/il2.webp" alt="il2" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Concept Art</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-2xl font-bold text-white mb-2">Cyber Shaman Ritual</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="il" data-image="portfolio/il4.webp" data-title="Whispers of the Hollow" data-desc="A painterly woodland scene using a desaturated blue, icy gray, and muted green palette to create a cold, eerie atmosphere. Massive tree trunks and dark foreground silhouettes frame an open clearing, directing attention toward the central narrative elements. Soft fog, layered foliage, distant trees, and subtle atmospheric perspective create depth and separation through the environment, while restrained warm red accents introduce tension and a sense of an unseen story unfolding within the forest.">
+                <div class="img-wrapper">
+                    <img src="portfolio/il4.webp" alt="il4" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Concept Art</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-2xl font-bold text-white mb-2">Whispers of the Hollow</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="il" data-image="portfolio/il5.webp" data-title="The Silent Mountain Path" data-desc="A cinematic landscape illustration dominated by deep blue, cyan, and cool desaturated tones, creating a peaceful yet melancholic atmosphere. Dense woodland frames a winding path that naturally leads the eye toward a distant mountain, creating a strong sense of depth, scale, and journey. Dark foreground vegetation contrasts against the pale illuminated mountain and sky, while the simplified painterly forms and atmospheric haze give the scene a quiet, storybook-like feeling of solitude and exploration.">
+                <div class="img-wrapper">
+                    <img src="portfolio/il5.webp" alt="il5" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Concept Art</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">The Silent Mountain Path</h3></div>
+                </div>
+            </div>
+
+            <!-- PRODUCT RENDERING (pr1 - pr5) -->
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="pr" data-image="portfolio/pr1.webp" data-title="Aerial Precision" data-desc="Clean product render of a modern drone, emphasizing matte composite housing, carbon-fiber arms, metallic motor components, and precision camera hardware. Soft studio lighting and a low three-quarter camera angle reveal the construction and material contrast while keeping the drone visually dominant.">
+                <div class="img-wrapper">
+                    <img src="portfolio/pr1.webp" alt="pr1" onerror="this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Product Rendering</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">Aerial Precision</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[400px]" data-category="pr" data-image="portfolio/pr2.webp" data-title="Studio Over-Ear Audio" data-desc="Minimalist headphone product visualization featuring soft ivory plastics, padded synthetic leather, and fine metallic mesh. A bold red studio environment provides strong color contrast, while soft directional lighting highlights the smooth surfaces, cushioning, and refined silhouette.">
+                <div class="img-wrapper">
+                    <img src="portfolio/pr2.webp" alt="pr2" onerror="this.src='https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Product Rendering</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-2xl font-bold text-white mb-2">Studio Over-Ear Audio</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[350px]" data-category="pr" data-image="portfolio/pr3.webp" data-title="Precision Timepiece" data-desc="Premium smartwatch presentation focused on brushed metal casing, dark leather straps, glass surfaces, and subtle display details. Controlled studio lighting brings out the material differences, with front and rear angles providing a clear view of the watch’s construction and detailing.">
+                <div class="img-wrapper">
+                    <img src="portfolio/pr3.webp" alt="pr3" onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Product Rendering</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Precision Timepiece</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[350px]" data-category="pr" data-image="portfolio/pr4.webp" data-title="Minimalist Chrono Watch" data-desc="Contemporary smartwatch render built around a black-on-black material palette, combining polished glass, satin metal, and soft rubber surfaces. Dramatic directional lighting and contrasting camera angles emphasize the watch’s silhouette, reflections, and fine mechanical details.">
+                <div class="img-wrapper">
+                    <img src="portfolio/pr4.webp" alt="pr4" onerror="this.src='https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Product Rendering</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-xl font-bold text-white mb-2">Minimalist Chrono Watch</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-4 h-[350px]" data-category="pr" data-image="portfolio/pr5.webp" data-title="Sleek Carbon Smartwatch" data-desc="Industrial product design render focusing on lightweight carbon fiber composite construction and tactile digital buttons.">
+                <div class="img-wrapper">
+                    <img src="portfolio/pr5.webp" alt="pr5" onerror="this.src='https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?q=80&w=800&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Product Rendering</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-xl font-bold text-white mb-2">Sleek Carbon Smartwatch</h3></div>
+                </div>
+            </div>
+
+            <!-- TAILORED 3D & VFX (vfx1, vfx2) -->
+            <div class="portfolio-card md:col-span-6 h-[420px]" data-category="vfx" data-image="portfolio/vfx1.webp" data-title="Sakura Dreams" data-desc="Hand-drawn 2D lyric animation combining painterly nature scenes with expressive keyframe motion and clean typography. Soft colors and flowing transitions create a calm, dreamlike atmosphere.">
+                <div class="img-wrapper">
+                    <img src="portfolio/vfx1.webp" alt="vfx1" onerror="this.src='https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Tailored 3D & VFX</span><span class="text-xs text-[#A8ABB3]">2026</span></div><h3 class="text-2xl font-bold text-white mb-2">Sakura Dreams</h3></div>
+                </div>
+            </div>
+
+            <div class="portfolio-card md:col-span-6 h-[420px]" data-category="vfx" data-image="portfolio/vfx2.webp" data-title="Where the Fireflies Go" data-desc="A whimsical 2D lyric video blending hand-drawn animation, soft forest silhouettes, and playful motion graphics. Warm glowing accents and drifting elements create a dreamy, storybook-like atmosphere.">
+                <div class="img-wrapper">
+                    <img src="portfolio/vfx2.webp" alt="vfx2" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop'">
+                    <div class="card-overlay"><div class="flex items-center justify-between mb-3"><span class="category-badge">Tailored 3D & VFX</span><span class="text-xs text-[#A8ABB3]">2025</span></div><h3 class="text-2xl font-bold text-white mb-2">Where the Fireflies Go</h3></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="relative z-20 w-full bg-[#080808] border-t border-[#1f1f1f] pt-16 pb-8 px-4 sm:px-6 lg:px-12 flex flex-col items-center">
+        <div class="max-w-[1240px] w-full flex flex-col md:flex-row items-center md:items-start justify-between gap-10 mb-12 relative">
+            <!-- Brand & Info -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left max-w-sm relative z-10">
+                <div class="flex items-center gap-4 mb-4">
+                    <a href="index.html" class="logo-swap !opacity-100" style="font-size: 1.5rem;"></a>
+                </div>
+                <p class="text-[#A8ABB3] text-sm leading-relaxed">
+                    A 3D Generalist & Designer focused on crafting immersive environments and bold visual experiences.
+                </p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left gap-3 z-10">
+                <h4 class="text-[#F5F5F7] font-bold uppercase tracking-widest text-xs mb-2">Explore</h4>
+                <a href="index.html" class="text-[#A8ABB3] hover:text-[#FA003F] text-sm transition-colors">Home</a>
+                <a href="portfolio.html" class="text-[#A8ABB3] hover:text-[#FA003F] text-sm transition-colors">Portfolio</a>
+                <a href="index.html#services" class="text-[#A8ABB3] hover:text-[#FA003F] text-sm transition-colors">Services</a>
+                <a href="index.html#about" class="text-[#A8ABB3] hover:text-[#FA003F] text-sm transition-colors">About</a>
+            </div>
+
+            <!-- Socials List -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left gap-3 z-10">
+                <h4 class="text-[#F5F5F7] font-bold uppercase tracking-widest text-xs mb-2">Connect</h4>
+                <div class="flex items-center gap-3">
+                    <a href="https://www.facebook.com/itsmedilshanyapa/" target="_blank" class="w-10 h-10 rounded-full bg-[#141414] border border-[#2a2a2a] flex items-center justify-center hover:border-[#FA003F] hover:bg-[#FA003F]/10 text-gray-400 hover:text-[#FA003F] transition-all duration-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7.5v4H10v12h4v-12z"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/s.o.t.a_/" target="_blank" class="w-10 h-10 rounded-full bg-[#141414] border border-[#2a2a2a] flex items-center justify-center hover:border-[#FA003F] hover:bg-[#FA003F]/10 text-gray-400 hover:text-[#FA003F] transition-all duration-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    </a>
+                    <a href="https://www.artstation.com/chamodyapa" target="_blank" class="w-10 h-10 rounded-full bg-[#141414] border border-[#2a2a2a] flex items-center justify-center hover:border-[#FA003F] hover:bg-[#FA003F]/10 text-gray-400 hover:text-[#FA003F] transition-all duration-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M0 17.75l3.5 6h17l-3.5-6H0zm18.5-13.5L12 6.5 5.5 4.25 2 10.5h20l-3.5-6.25zM12 9.5l4.5 7.75h-9L12 9.5z"/></svg>
+                    </a>
+                    <a href="https://github.com/nutinab" target="_blank" class="w-10 h-10 rounded-full bg-[#141414] border border-[#2a2a2a] flex items-center justify-center hover:border-[#FA003F] hover:bg-[#FA003F]/10 text-gray-400 hover:text-[#FA003F] transition-all duration-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/dilshan-yapa-316870148" target="_blank" class="w-10 h-10 rounded-full bg-[#141414] border border-[#2a2a2a] flex items-center justify-center hover:border-[#FA003F] hover:bg-[#FA003F]/10 text-gray-400 hover:text-[#FA003F] transition-all duration-300">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="max-w-[1240px] w-full border-t border-[#1f1f1f] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[#A8ABB3] text-xs z-10">
+            <p>&copy; 2026 Dilshan Yapa. All rights reserved.</p>
+            <div class="flex gap-4">
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         FULLSCREEN PORTFOLIO MODAL (ZOOMED VIEW)
+         ========================================== -->
+    <div id="portfolio-modal">
+        
+        <!-- Top Bar: Back Button -->
+        <div class="w-full p-6 flex justify-start items-center flex-shrink-0">
+            <button id="modal-close" class="text-[#A8ABB3] hover:text-[#F5F5F7] flex items-center gap-2 transition-colors group cursor-pointer">
+                <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span class="text-sm font-semibold uppercase tracking-widest">Back to Portfolio</span>
+            </button>
+        </div>
+
+        <!-- Center: Image & Navigation -->
+        <div class="flex-1 w-full flex flex-col md:flex-row items-center justify-center px-4 md:px-12 gap-6 relative min-h-0">
+            
+            <!-- Left Arrow -->
+            <button id="modal-prev" class="absolute left-4 md:relative md:left-0 z-50 p-4 rounded-full bg-[#17171D] border border-[#2A2A32] text-[#F5F5F7] hover:border-[#F5F5F7] transition-all flex-shrink-0 cursor-pointer shadow-lg hidden md:block">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+
+            <!-- Image Container -->
+            <div id="modal-img-container" class="relative flex-1 w-full h-full max-h-[60vh] md:max-h-[70vh] flex justify-center items-center">
+                <img id="modal-img" src="" alt="Portfolio Fullscreen" class="max-w-full max-h-full object-contain rounded-lg drop-shadow-[0_15px_35px_rgba(245,245,247,0.1)] transition-opacity duration-300">
+            </div>
+
+            <!-- Right Arrow -->
+            <button id="modal-next" class="absolute right-4 md:relative md:right-0 z-50 p-4 rounded-full bg-[#17171D] border border-[#2A2A32] text-[#F5F5F7] hover:border-[#F5F5F7] transition-all flex-shrink-0 cursor-pointer shadow-lg hidden md:block">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            
+            <!-- Mobile Navigation Overlay -->
+            <div class="absolute inset-y-0 left-0 w-1/3 z-40 md:hidden" id="modal-prev-mobile"></div>
+            <div class="absolute inset-y-0 right-0 w-1/3 z-40 md:hidden" id="modal-next-mobile"></div>
+        </div>
+
+        <!-- Bottom: Text Information -->
+        <div class="w-full p-6 pb-12 flex flex-col items-center text-center flex-shrink-0">
+            <span id="modal-category" class="category-badge mb-4">Category</span>
+            <h2 id="modal-title" class="text-2xl md:text-3xl lg:text-4xl font-bold text-[#F5F5F7] mb-4">Title</h2>
+            <p id="modal-desc" class="text-[#A8ABB3] max-w-2xl text-sm md:text-base leading-relaxed">
+                Description goes here.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+         ========================================== -->
+    <script>
+        // --- SCRIPT 1: LOADER & MORPHING LOGO ---
+        window.addEventListener('load', () => {
+            const pageLoader = document.getElementById('page-loader');
+            const animLogo = document.getElementById('anim-logo');
+            const mainNav = document.getElementById('main-nav');
+            const targetLogo = document.getElementById('target-logo');
+            
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                const rect = targetLogo.getBoundingClientRect();
+                const targetX = rect.left + (rect.width / 2);
+                const targetY = rect.top + (rect.height / 2);
+                const targetFontSize = window.getComputedStyle(targetLogo).fontSize;
+
+                animLogo.style.top = `${targetY}px`;
+                animLogo.style.left = `${targetX}px`;
+                animLogo.style.fontSize = targetFontSize;
+                
+                pageLoader.style.opacity = '0';
+                
+                setTimeout(() => {
+                    pageLoader.style.display = 'none';
+                    animLogo.style.opacity = '0';
+                    
+                    targetLogo.style.opacity = '1';
+                    mainNav.classList.add('ready');
+                    document.body.style.overflow = 'auto';
+                    
+                    setTimeout(() => animLogo.remove(), 300);
+                }, 1000); 
+            }, 600);
+        });
+
+        // --- SCRIPT 2: CATEGORY FILTERING LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.portfolio-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filterValue = btn.getAttribute('data-filter');
+
+                    cards.forEach(card => {
+                        const cardCategory = card.getAttribute('data-category');
+                        if (filterValue === 'all' || cardCategory === filterValue) {
+                            card.classList.remove('is-hidden');
+                        } else {
+                            card.classList.add('is-hidden');
+                        }
+                    });
+                });
+            });
+        });
+
+        // --- SCRIPT 3: MODAL & LIGHTBOX LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('portfolio-modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalTitle = document.getElementById('modal-title');
+            const modalCategory = document.getElementById('modal-category');
+            const modalDesc = document.getElementById('modal-desc');
+            const closeBtn = document.getElementById('modal-close');
+            
+            // Navigation Elements
+            const prevBtn = document.getElementById('modal-prev');
+            const nextBtn = document.getElementById('modal-next');
+            const prevMobile = document.getElementById('modal-prev-mobile');
+            const nextMobile = document.getElementById('modal-next-mobile');
+            const imgContainer = document.getElementById('modal-img-container');
+
+            let currentCategoryItems = [];
+            let currentIndex = 0;
+
+            const categoryMap = {
+                'env': 'Environment Design',
+                'int': 'Interior Design',
+                'pr': 'Product Rendering',
+                'vfx': 'Tailored 3D & VFX',
+                'il': 'Concept Art & Illustration'
+            };
+
+            // Open Modal
+            document.querySelectorAll('.portfolio-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const category = card.getAttribute('data-category');
+                    
+                    currentCategoryItems = Array.from(document.querySelectorAll(`.portfolio-card[data-category="${category}"]`));
+                    currentIndex = currentCategoryItems.indexOf(card);
+                    
+                    updateModalContent();
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            function updateModalContent() {
+                const item = currentCategoryItems[currentIndex];
+                
+                modalImg.style.opacity = 0;
+                
+                setTimeout(() => {
+                    modalImg.src = item.getAttribute('data-image') || item.querySelector('img').src;
+                    modalTitle.textContent = item.getAttribute('data-title');
+                    modalCategory.textContent = categoryMap[item.getAttribute('data-category')];
+                    modalDesc.textContent = item.getAttribute('data-desc');
+                    modalImg.style.opacity = 1;
+                }, 150);
+            }
+
+            // Close Modal
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Navigate Previous
+            function goPrev() {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentCategoryItems.length - 1;
+                updateModalContent();
+            }
+
+            // Navigate Next
+            function goNext() {
+                currentIndex = (currentIndex < currentCategoryItems.length - 1) ? currentIndex + 1 : 0;
+                updateModalContent();
+            }
+
+            // Button Event Listeners
+            prevBtn.addEventListener('click', goPrev);
+            nextBtn.addEventListener('click', goNext);
+            prevMobile.addEventListener('click', goPrev);
+            nextMobile.addEventListener('click', goNext);
+
+            // Scroll to navigate within category
+            let isWheeling = false;
+            imgContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (isWheeling) return;
+                
+                isWheeling = true;
+                setTimeout(() => { isWheeling = false; }, 600);
+                
+                if (e.deltaY > 0) {
+                    goNext();
+                } else {
+                    goPrev();
+                }
+            }, { passive: false });
+        });
+
+        // --- SCRIPT 4: SCROLL REVEAL OBSERVER ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
